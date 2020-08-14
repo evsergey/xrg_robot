@@ -1,9 +1,9 @@
 #include "exceptions.h"
 #include "servo.h"
-#include "wiringPi.h"
-#include "wiringPiI2C.h"
 
 #include <initializer_list>
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
 
 namespace xrg_robot
 {

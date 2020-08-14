@@ -7,6 +7,6 @@ file(GLOB headers "include/*.h")
 
 add_executable(test test/main.cpp)
 target_sources(test PRIVATE ${cpp_sources})
-target_link_libraries(test wiringPi)
+target_link_libraries(test wiringPi pthread)
 
 install(TARGETS test DESTINATION bin)
