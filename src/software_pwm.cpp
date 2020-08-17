@@ -7,7 +7,6 @@
 #include <thread>
 #include <vector>
 #include <wiringPi.h>
-#include <iostream>
 namespace xrg_robot
 {
 namespace impl
@@ -53,8 +52,7 @@ private:
                     break;
             }
         }
-        if(slept < _total)
-            delayMicroseconds(_total - slept);
+        return slept;
     }
 
     void thread_loop()
@@ -62,10 +60,9 @@ private:
         while(!_exit.load())
         {
             const auto actions = std::atomic_load(&_current_actions);
-            if(!actions)
-                delayMicroseconds(_total);
-            else
-                process_actions(*actions);
+            int slept = actions ? process_actions(*actions) : 0;
+            if(slept < _total)
+                delayMicroseconds(_total - slept);
         }
     }
 
@@ -109,9 +106,6 @@ public:
                     new_actions.push_back(action{action_type::pin_clear, p.first});
             }
         std::atomic_store(&_current_actions, std::make_shared<decltype(new_actions)>(std::move(new_actions)));
-
-        for(auto& a: *_current_actions)
-            std::cout << a.type << " (" << a.param << ")" << std::endl;
     }
 
     std::unordered_map<int, double> values;
