@@ -31,7 +31,7 @@ private:
     std::atomic_bool _exit;
     std::thread _worker;
 
-    void process_actions(const std::vector<action>& actions)
+    int process_actions(const std::vector<action>& actions)
     {
         int slept = 0;
         for(auto& action: actions)

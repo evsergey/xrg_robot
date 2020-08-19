@@ -1,44 +1,77 @@
 #include "servo.h"
-#include "software_pwm.h"
+#include "motor_control.h"
 
-#include <wiringPi.h>
+#include <chrono>
+#include <thread>
 
 
 using namespace xrg_robot;
+using namespace std::literals;
 
 int main()
 {
     servo_control servo;
-    software_pwm pwm(1000);
-    servo.set_angle(1, 90);
-    servo.set_angle(2, 90);
+    motor_control motor;
 
-    pinMode(23, OUTPUT);
-    pinMode(24, OUTPUT);
-    pinMode(27, OUTPUT);
+    // park manipulator
+    servo.set_angle(3, 90);
+    std::this_thread::sleep_for(300ms);
+    servo.set_angle(1, 180);
+    servo.set_angle(2, 10);
+    std::this_thread::sleep_for(500ms);
+    servo.set_angle(2, -10);
+    std::this_thread::sleep_for(200ms);
+    servo.save_as_default();
 
-    pinMode(28, OUTPUT);
-    pinMode(29, OUTPUT);
-    pinMode(25, OUTPUT);
+    // catch
+    servo.set_angle(3, 180);
+    servo.set_angle(2, 30);
+    std::this_thread::sleep_for(300ms);
+    servo.set_angle(4, 35);
+    std::this_thread::sleep_for(100ms);
+    servo.set_angle(1, 25);
+    servo.set_angle(2, 50);
+    std::this_thread::sleep_for(500ms);
 
-    pwm[23] = 0.5;
-    pwm[28] = 0.5;
-    pwm.update();
+    // grap
+    servo.set_angle(3, 90);
+    servo.set_angle(4, 75);
+    std::this_thread::sleep_for(200ms);
+    servo.set_angle(3, 0);
+    servo.set_angle(4, 90);
+    std::this_thread::sleep_for(200ms);
 
-    digitalWrite(24, HIGH);
-    digitalWrite(27, LOW);
-    digitalWrite(29, HIGH);
-    digitalWrite(25, LOW);
+    // carry
+    servo.set_angle(3, 180);
+    std::this_thread::sleep_for(300ms);
+    servo.set_angle(1, 180);
+    servo.set_angle(2, 60);
+    std::this_thread::sleep_for(500ms);
+    motor.set_speed(1, 1);
+    std::this_thread::sleep_for(1500ms);
+    motor.set_speed(0, 0);
 
-    delayMicroseconds(2000000);
-    pwm[23] = 0.;
-    pwm[28] = 0.;
-    pwm.update();
-    digitalWrite(24, LOW);
-    digitalWrite(27, LOW);
-    digitalWrite(29, LOW);
-    digitalWrite(25, LOW);
-    
+    // drop
+    servo.set_angle(2, 30);
+    std::this_thread::sleep_for(200ms);
+    servo.set_angle(1, 50);
+    servo.set_angle(2, 80);
+    std::this_thread::sleep_for(500ms);
+    servo.set_angle(3, 180);
+    servo.set_angle(4, 60);
+    std::this_thread::sleep_for(500ms);
+
+    // park and go back
+    servo.set_angle(3, 90);
+    std::this_thread::sleep_for(300ms);
+    servo.set_angle(1, 180);
+    servo.set_angle(2, 10);
+    std::this_thread::sleep_for(500ms);
+    servo.set_angle(2, -10);
+    std::this_thread::sleep_for(200ms);
+    motor.set_speed(-1, -1);
+    std::this_thread::sleep_for(1500ms);
+    motor.set_speed(0, 0);
 
     return 0;
 }
