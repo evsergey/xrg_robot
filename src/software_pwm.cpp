@@ -57,7 +57,7 @@ private:
 
     void thread_loop()
     {
-        while(!_exit.load())
+        while(!_exit.load(std::memory_order_relaxed))
         {
             const auto actions = std::atomic_load(&_current_actions);
             int slept = actions ? process_actions(*actions) : 0;
@@ -77,7 +77,7 @@ public:
 
     ~software_pwm()
     {
-        _exit.store(true);
+        _exit.store(true, std::memory_order_relaxed);
         _worker.join();
     }
 
